@@ -2,9 +2,9 @@
 :root{
     --board-width:30em;
     --board-height:30em;
-    --color1:#831717;
-    --color2:#ff947c;
-    --move-color:#f56868;
+    --color1:#831717ba;
+    --color2:#ff947cab;
+    --move-color:#a71515;
 }
 *{
     margin: 0px;
@@ -40,11 +40,12 @@ main{
     align-items: center;
     background-color: var(--color1);
   }
-.cell > div{
-  width: 2px;
-  height: 2px;
-  background-color: black;
+.cell > div.highlight{
+  width: 1rem;
+  height: 1rem;
+  background-color: #d136027e;
   border-radius: 50%;
+  z-index: -1;
 }
   
   .line:nth-child(even) > .cell:nth-child(odd),

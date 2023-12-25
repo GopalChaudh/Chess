@@ -1,3 +1,14 @@
+const  chessBoard = [
+    ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
+    ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
+    ['a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3'],
+    ['a4', 'b4', 'c4', 'd4', 'e4', 'f4', 'g4', 'h4'],
+    ['a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5'],
+    ['a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6'],
+    ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
+    ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'],
+  ];
+
 class Pawn {
     constructor(type) {
         this.image = `../public/${type}_pawn.png`;
@@ -11,9 +22,29 @@ class Pawn {
         cell.innerHTML = `<img src="${this.image}" alt="pawn" id="${pawnId}" class="meterial">`;
         
     }
-    static move(col,row) {
-      
-          return [`${String.fromCharCode(97-(col+1) % 26)}${row+1}`];
+    static move(col,row,type) {
+            let List = [];
+            if(type == 'P'){ // black
+                
+                if(col == 1){
+                    List.push(chessBoard[col+2][row]);
+                    
+                }
+                if(col+1 < 7){
+
+                    List.push(chessBoard[col+1][row]);
+                }
+            }else{
+                if(col == 6){
+                    List.push(chessBoard[col-2][row]);
+                    
+                }
+                if(col-1 > 1){
+
+                    List.push(chessBoard[col-1][row]);
+                }
+            }
+          return List ;
         }
       
        
@@ -87,22 +118,16 @@ class Rook{
 
 class ChessBoard{
     constructor(){
-        this.ChessBoard = [
-            ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
-            ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
-            ['a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3'],
-            ['a4', 'b4', 'c4', 'd4', 'e4', 'f4', 'g4', 'h4'],
-            ['a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5'],
-            ['a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6'],
-            ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
-            ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'],
-          ];
+       
         this.possitionArray = [];
         this.defaultPosition = 'RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr';
         this.movePiece_from = "";
         this.movePiece_to = "";
     }
     movePiece(x,y){
+        // remove heilight
+        document.querySelectorAll('.highlight').forEach(ele => ele.remove());
+
         let sId = x.split('-')[0];
         let piece_type = x.split('-')[1];
         let dId = y;
@@ -172,25 +197,27 @@ class ChessBoard{
     move() {
         const pawnPiece = document.querySelector(`#chessboard`);
         pawnPiece.addEventListener('click', (event) => {
-            
-           if(this.movePiece_from === ""){
-                if(event.target.id.length > 2){
+            if(event.target.id.length > 2 && event.srcElement.className != "selected" && event.srcElement.className == "meterial"){
+                this.movePiece_from = event.target.id;
+                let validMoves = moveAblePath(this.movePiece_from);
 
-                    this.movePiece_from =  event.target.id;
-                    let MoveList = moveAblePath(event.target.id);
-                    console.log(MoveList);
-                    console.log('from captured',event.target.id);
-                }
+                Highlight(validMoves)
+
+
+
+
                 
-                
-            }else{
-                if(event.target.id.length == 2){
+            }else if(this.movePiece_from !=""){
+                if(event.srcElement.className == "selected" || ( event.srcElement.firstChild && event.srcElement.firstChild.className == "highlight")){
 
                     this.movePiece_to = event.target.id;
-                    console.log('to captured',event.target.id);
+                    // console.log('to captured',event.target.id);
                     this.movePiece(this.movePiece_from,this.movePiece_to);
                     this.movePiece_from = "";
                     this.movePiece_to = "";
+                }else{
+                    this.movePiece_from = event.target.id;
+                    
                 }
            }
            
@@ -208,56 +235,56 @@ class ChessBoard{
                         // pawn
                         if(str[row] === 'p'){
                             let pawn = new Pawn('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'P'){
                             let pawn = new Pawn('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         // king
                         else if(str[row] === 'k'){
                             let pawn = new King('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'K'){
                             let pawn = new King('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         // queen
                         else if(str[row] === 'q'){
                             let pawn = new Queen('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'Q'){
                             let pawn = new Queen('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         // rook
                         else if(str[row] === 'r'){
                             let pawn = new Rook('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'R'){
                             let pawn = new Rook('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         // knight
                         else if(str[row] === 'n'){
                             let pawn = new Knight('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'N'){
                             let pawn = new Knight('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         // bishop
                         else if(str[row] === 'b'){
                             let pawn = new Bishop('white');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                         else if(str[row] === 'B'){
                             let pawn = new Bishop('black');
-                            pawn.create(`${this.ChessBoard[row][col]}`);
+                            pawn.create(`${chessBoard[col][row]}`);
                         }
                     }
                     
@@ -269,6 +296,7 @@ class ChessBoard{
     }
     
 }
+//main 
 function main(){
     const chess = new ChessBoard();
     chess.start();
@@ -280,21 +308,23 @@ function moveAblePath(Source_Position){
     const currPos = Source_Position.split('-')[0]; 
     const type = Source_Position.split('-')[1]; 
 
-    let row = parseInt(currPos[1])-1;
-    let col = currPos[0].charCodeAt(0) - 'a'.charCodeAt(0);
-    console.log(currPos,row,col);
+    let col = parseInt(currPos[1])-1;
+    let row = currPos[0].charCodeAt(0) - 'a'.charCodeAt(0) ;
+
+    console.log(Source_Position, col,row);
     if(type === 'p' || type === 'P'){
         return Pawn.move(col,row,type);
     }
-    return MoveList;
+    return [];
 }
 
 function Highlight(moveList){
+    document.querySelectorAll('.highlight').forEach(ele => ele.remove());
     moveList.forEach((ele)=>{
         let box = document.getElementById(ele);
         if(box.innerHTML == ""){
 
-            box.append('div');
+            box.innerHTML = '<div class="highlight"> <div>';
         }
     })
 }
